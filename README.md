@@ -1,7 +1,7 @@
 # To-Do App  
 
 Eine schlanke To-Do-Listen-Webapplikation mit **JavaScript-Frontend** und **Python-Backend**.  
-Das Frontend kommuniziert ausschliesslich mit dem Backend, das Backend speichert die Daten in **MongoDB (NoSQL)**.  
+Das Frontend kommuniziert ausschliesslich mit dem Backend, das Backend speichert die Daten in **Supabase**.  
 
 ---
 
