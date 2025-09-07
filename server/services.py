@@ -1,4 +1,4 @@
-from server.db.config import supabase
+from server.config import supabase
 
 
 def getAllTasks():

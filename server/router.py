@@ -1,5 +1,5 @@
 from flask import Flask
-from server.services.services import getAllTasks
+from server.services import getAllTasks
 
 app = Flask(__name__)
 
