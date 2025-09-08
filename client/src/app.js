@@ -1,10 +1,10 @@
 //! zumleeren -> im console localStorage.clear()
 
-const API_BASE_URL = "http://localhost:XXXX/api/todos"; // URL der API, später anpassen 
+import { API_BASE_URL } from "./config.js"; 
+const API_BASE_URL = "http://localhost:5500/api/tasks"; // URL der API, später anpassen 
 
 
-
-// endpoint mapping -> hier werden die verschiedenen Endpunkte der API definiert
+// endpoint mapping -> hier werden die Endpunkte der API definiert
 const API={
     listTasks: () => `${API_BASE_URL}/tasks`, // GET alle Tasks
     createTask: () => `${API_BASE_URL}/task`, // POST neues Task
@@ -18,26 +18,25 @@ function jsonMaker(data) {
     return JSON.stringify(data);
 }
 
-//hier schluessel setzen
-const STORAGE_KEY = "todosData"; 
 
-//hier laden oder leer array
-let todos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-// beispieldaten
-if (todos.length === 0) {
-  todos = [
-    { id: 1, title: "Testaufgabe1", description: "nur zum testen1", dueDate: "2025-09-01", priority: "low", status: false },
-    { id: 2, title: "Testaufgabe2", description: "nur zum testen2", dueDate: "2026-09-01", priority: "medium", status: false }
-  ];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-}
+// //hier laden oder leer array
+// let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+// // beispieldaten
+// if (tasks.length === 0) {
+//   tasks = [
+//     { id: 1, title: "Testaufgabe1", description: "nur zum testen1", dueDate: "2025-09-01", priority: "low", status: false },
+//     { id: 2, title: "Testaufgabe2", description: "nur zum testen2", dueDate: "2026-09-01", priority: "medium", status: false }
+//   ];
+//   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+// }
 
 
 
 let addButton = document.querySelector(".addButton");
 
-let todoForm = document.getElementById("todoForm"); // Formular Anzeige
+let taskForm = document.getElementById("taskForm"); // Formular Anzeige
 
 let titleInput = document.getElementById("titleInput");
 let descriptionInput = document.getElementById("descriptionInput");
@@ -49,7 +48,7 @@ let cancelButton = document.getElementById("cancelButton");
 let deleteButton = document.querySelectorAll(".deleteButton");
 let editButton = document.querySelectorAll(".editButton");
 let statusCheckbox = document.querySelectorAll(".statusCheckbox");
-let todoTableBody = document.getElementById("todoTableBody");
+let taskTableBody = document.getElementById("taskTableBody");
 
 
 
@@ -58,42 +57,62 @@ let todoTableBody = document.getElementById("todoTableBody");
 // Formular hinzufügen (button)
 addButton.addEventListener("click", () => {
 //! Handle click event
-        todoForm.style.display = "block"; // Formular anzeigen
+        taskForm.style.display = "block"; // Formular anzeigen
 });
 
 // Formular speichern (button)
 submitButton.addEventListener("click", (e) => {
     e.preventDefault(); // Verhindert das automatische Neuladen der Seite
-    
-    // Formular absenden und neues Todo erstellen
-    const newTodo = {
+
+    // Formular absenden und neues Task erstellen
+    const newTask = {
         title: titleInput.value,
         description: descriptionInput.value,
         dueDate: dueDateInput.value,
         priority: prioritySelect.value,
         status: false
     };
-    console.log("Erhaltene Daten", newTodo);  // Debugging: Überprüfen der erhaltenen Daten
-    
-    const newData = jsonMaker(newTodo); // Daten in JSON umwandeln
+    console.log("Erhaltene Daten", newTask);  // Debugging: Überprüfen der erhaltenen Daten
+
+    const newData = jsonMaker(newTask); // Daten in JSON umwandeln
     console.log("In JSON umgewandelt", newData); // Debugging: Überprüfen der JSON-Daten
 
 
+    //----------------- Hier API POST Anfrage -----------------
+        // Nur POST-Anfrage senden
+        (async () => {
+            try {
+                const response = await fetch(API.createTask(), {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json" // umwandeln für JSON-Daten
+                    },
+                    body: jsonMaker(newTask)
+                });
+                if (!response.ok) throw new Error("Fehler beim Speichern der Aufgabe!");
+                alert("Task erfolgreich gespeichert!");
+                taskForm.reset();
+                taskForm.style.display = "none";
+            } catch (error) {
+                console.error("Fehler beim Senden der Daten an die API:", error);
+                alert(error.message || "Fehler beim Speichern der Aufgabe. Bitte versuchen Sie es erneut.");
+            }
+        })();
 
-    //! es wird värandert 
-    todos.push(newTodo);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); //! Daten speichern im localStorage
-                                                            //! Nachher muss es mit DB verbunden werden
-    renderTodos();
-    todoForm.reset();
-    todoForm.style.display = "none";
+    // //! es wird värandert
+    // tasks.push(newTask);
+    // localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); //! Daten speichern im localStorage
+    //                                                         //! Nachher muss es mit DB verbunden werden
+    // rendertasks();
+    // taskForm.reset();
+    // taskForm.style.display = "none";
 });
 
 // Formular abbrechen (button) 
 cancelButton.addEventListener("click", (e) => {
     e.preventDefault();  // Warten auf Klick
-    todoForm.reset();     // Formular leeren
-    todoForm.style.display = "none"; // Formular ausblenden
+    taskForm.reset();     // Formular leeren
+    taskForm.style.display = "none"; // Formular ausblenden
 });
 //--------------------------Hinzufügen--------------------------------------
 
@@ -137,14 +156,14 @@ function calculateRemainingDays(dueDate) {
 }
 
 // render funktion für Anzeige der Tabelle
-function renderTodos() {
-    todoTableBody.innerHTML = "";
-    todos.forEach((todo, index) => {
-        const title = todo.title ?? "";              //hier leer wenn es undefiniert
-        const description = todo.description ?? "";  
-        const dueDate = todo.dueDate ?? "";          
-        const priority = todo.priority ?? "";        
-        const daysLeft = calculateRemainingDays(todo.dueDate); 
+function rendertasks() {
+    taskTableBody.innerHTML = "";
+    tasks.forEach((task, index) => {
+        const title = task.title ?? "";              //hier leer wenn es undefiniert
+        const description = task.description ?? "";  
+        const dueDate = task.dueDate ?? "";          
+        const priority = task.priority ?? "";        
+        const daysLeft = calculateRemainingDays(task.dueDate); 
 
 
         let row = document.createElement("tr");
@@ -156,16 +175,16 @@ function renderTodos() {
             <td>${daysLeft}</td>  
             <td>${priority}</td>
             <td>
-            <input type="checkbox" class="statusCheckbox" ${todo.status ? "checked" : ""}>
+            <input type="checkbox" class="statusCheckbox" ${task.status ? "checked" : ""}>
             </td>
             <td>
             <button type="button" class="deleteButton">Löschen</button>
             <button type="button" class="editButton">Bearbeiten</button>
             </td>
         `;
-        todoTableBody.appendChild(row);
+        taskTableBody.appendChild(row);
     });
 }
 
-renderTodos();
+rendertasks();
 

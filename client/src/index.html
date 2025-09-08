@@ -22,7 +22,7 @@
       <th>Aktionen</th>
     </tr>
   </thead>
-  <tbody id="todoTableBody">
+  <tbody id="taskTableBody">
  <!-- es wird von JS gefüllt -->
   </tbody>
 </table>
@@ -32,7 +32,7 @@
     </div>
 
     <!-- verstecktes Form-->
-     <form id="todoForm" style="display: none;">
+     <form id="taskForm" style="display: none;">
       <br><br>
       <label for="title">Titel:</label>
       <input type="text" id="title" name="title" required><br><br>
@@ -57,8 +57,7 @@
       
      </form>
 
-    
-    
-    <script src="app.js"></script>
+      <script src="app.js"></script>
+      <script>window.API_BASE_URL = "http://localhost:5500/api/tasks";</script>
 </body>
 </html>
