@@ -1,9 +1,22 @@
 //! zumleeren -> im console localStorage.clear()
 
+const API_BASE_URL = "http://localhost:XXXX/api/todos"; // URL der API, später anpassen 
 
-// Todo Alle Buttons a
 
-//let todos = [];
+
+// endpoint mapping -> hier werden die verschiedenen Endpunkte der API definiert
+const API={
+    listTasks: () => `${API_BASE_URL}/todos`, // GET alle Tasks
+    createTask: () => `${API_BASE_URL}/todos`, // POST neues Task
+    updateTask: (id) => `${API_BASE_URL}/todos/${id}`, // PUT Task aktualisieren
+    deleteTask: (id) => `${API_BASE_URL}/todos/${id}` // DELETE Task löschen
+    //?healthCheck: () => `${API_BASE_URL}/health` // GET Gesundheitscheck (optional)
+};
+
+// Daten in JSON umwandeln
+function jsonMaker(data) {
+    return JSON.stringify(data);
+}
 
 //hier schluessel setzen
 const STORAGE_KEY = "todosData"; 
@@ -14,8 +27,8 @@ let todos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 // beispieldaten
 if (todos.length === 0) {
   todos = [
-    { id: 1, title: "Testaufgabe", description: "nur zum testen", dueDate: "2025-09-01", priority: "low", status: false },
-    { id: 1, title: "Testaufgabe", description: "nur zum testen", dueDate: "2026-09-01", priority: "low", status: false }
+    { id: 1, title: "Testaufgabe1", description: "nur zum testen1", dueDate: "2025-09-01", priority: "low", status: false },
+    { id: 2, title: "Testaufgabe2", description: "nur zum testen2", dueDate: "2026-09-01", priority: "medium", status: false }
   ];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
 }
@@ -60,6 +73,14 @@ submitButton.addEventListener("click", (e) => {
         priority: prioritySelect.value,
         status: false
     };
+    console.log("Erhaltene Daten", newTodo);  // Debugging: Überprüfen der erhaltenen Daten
+    
+    const newData = jsonMaker(newTodo); // Daten in JSON umwandeln
+    console.log("In JSON umgewandelt", newData); // Debugging: Überprüfen der JSON-Daten
+
+
+
+    //! es wird värandert 
     todos.push(newTodo);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); //! Daten speichern im localStorage
                                                             //! Nachher muss es mit DB verbunden werden
