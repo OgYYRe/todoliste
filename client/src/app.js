@@ -23,6 +23,16 @@ if (todos.length === 0) {
 
 
 let addButton = document.querySelector(".addButton");
+
+let todoForm = document.getElementById("todoForm"); // Formular Anzeige
+
+let titleInput = document.getElementById("titleInput");
+let descriptionInput = document.getElementById("descriptionInput");
+let dueDateInput = document.getElementById("dueDateInput");
+let prioritySelect = document.getElementById("prioritySelect");
+let submitButton = document.getElementById("submitButton");
+let cancelButton = document.getElementById("cancelButton");
+
 let deleteButton = document.querySelectorAll(".deleteButton");
 let editButton = document.querySelectorAll(".editButton");
 let statusCheckbox = document.querySelectorAll(".statusCheckbox");
@@ -30,6 +40,7 @@ let todoTableBody = document.getElementById("todoTableBody");
 
 addButton.addEventListener("click", () => {
         //! Handle click event
+        todoForm.style.display = "block"; // Formular anzeigen
 });
 
 deleteButton.forEach(element => {
@@ -48,6 +59,30 @@ statusCheckbox.forEach(element => {
     element.addEventListener("change", () => {
         //! Handle change event
     });
+});
+
+submitButton.addEventListener("click", (e) => {
+    e.preventDefault(); // Verhindert das automatische Neuladen der Seite
+    
+    //! Formular absenden
+    const newTodo = {
+        title: titleInput.value,
+        description: descriptionInput.value,
+        dueDate: dueDateInput.value,
+        priority: prioritySelect.value,
+        status: false
+    };
+    todos.push(newTodo);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    renderTodos();
+    todoForm.reset();
+    todoForm.style.display = "none";
+});
+
+cancelButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    todoForm.reset();
+    todoForm.style.display = "none";
 });
 
 // Datum Berechnung

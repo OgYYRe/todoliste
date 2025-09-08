@@ -31,6 +31,32 @@
 </section>
     </div>
 
+    <!-- verstecktes Form-->
+     <form id="todoForm" style="display: none;">
+      <br><br>
+      <label for="title">Titel:</label>
+      <input type="text" id="title" name="title" required><br><br>
+      
+      <label for="description">Beschreibung:</label>
+      <input type="text" id="description" name="description"><br><br>
+
+      <label for="dueDate">Enddatum:</label>
+      <input type="date" id="dueDate" name="dueDate"><br><br>
+
+      <label for="priority">Priorität:</label>
+      <select id="priority" name="priority">
+        <option value="low">Niedrig</option>
+        <option value="medium">Mittel</option>
+        <option value="high">Hoch</option>
+      </select><br><br>
+
+      <button type="button" id="submitButton">Speichern</button>
+      <button type="button" id="cancelButton">Abbrechen</button>
+      <br><br>
+
+      
+     </form>
+
     
     
     <script src="app.js"></script>
