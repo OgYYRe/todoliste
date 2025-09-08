@@ -34,17 +34,17 @@
     <!-- verstecktes Form-->
      <form id="taskForm" style="display: none;">
       <br><br>
-      <label for="title">Titel:</label>
-      <input type="text" id="title" name="title" required><br><br>
-      
-      <label for="description">Beschreibung:</label>
-      <input type="text" id="description" name="description"><br><br>
+      <label for="titleInput">Titel:</label>
+      <input type="text" id="titleInput" name="title" required><br><br>
 
-      <label for="dueDate">Enddatum:</label>
-      <input type="date" id="dueDate" name="dueDate"><br><br>
+      <label for="descriptionInput">Beschreibung:</label>
+      <input type="text" id="descriptionInput" name="description"><br><br>
 
-      <label for="priority">Priorität:</label>
-      <select id="priority" name="priority">
+      <label for="dueDateInput">Enddatum:</label>
+      <input type="date" id="dueDateInput" name="dueDate"><br><br>
+
+      <label for="priorityInput">Priorität:</label>
+      <select id="priorityInput" name="priority">
         <option value="low">Niedrig</option>
         <option value="medium">Mittel</option>
         <option value="high">Hoch</option>
@@ -57,7 +57,7 @@
       
      </form>
 
-      <script src="app.js"></script>
-      <script>window.API_BASE_URL = "http://localhost:5500/api/tasks";</script>
+     <script>window.API_BASE_URL = "http://localhost:5500/api/tasks";</script>
+     <script src="app.js"></script>
 </body>
 </html>

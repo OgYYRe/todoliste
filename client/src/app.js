@@ -1,7 +1,6 @@
 //! zumleeren -> im console localStorage.clear()
 
-import { API_BASE_URL } from "./config.js"; 
-const API_BASE_URL = "http://localhost:5500/api/tasks"; // URL der API, später anpassen 
+const API_BASE_URL = (window.API_BASE_URL || "http://localhost:5500/api"); // URL der API, später anpassen 
 
 
 // endpoint mapping -> hier werden die Endpunkte der API definiert
