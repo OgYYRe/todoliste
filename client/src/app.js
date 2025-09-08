@@ -6,10 +6,10 @@ const API_BASE_URL = "http://localhost:XXXX/api/todos"; // URL der API, später 
 
 // endpoint mapping -> hier werden die verschiedenen Endpunkte der API definiert
 const API={
-    listTasks: () => `${API_BASE_URL}/todos`, // GET alle Tasks
-    createTask: () => `${API_BASE_URL}/todos`, // POST neues Task
-    updateTask: (id) => `${API_BASE_URL}/todos/${id}`, // PUT Task aktualisieren
-    deleteTask: (id) => `${API_BASE_URL}/todos/${id}` // DELETE Task löschen
+    listTasks: () => `${API_BASE_URL}/tasks`, // GET alle Tasks
+    createTask: () => `${API_BASE_URL}/task`, // POST neues Task
+    updateTask: (id) => `${API_BASE_URL}/task/${id}`, // PUT Task aktualisieren
+    deleteTask: (id) => `${API_BASE_URL}/task/${id}` // DELETE Task löschen
     //?healthCheck: () => `${API_BASE_URL}/health` // GET Gesundheitscheck (optional)
 };
 
