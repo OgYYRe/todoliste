@@ -38,33 +38,21 @@ let editButton = document.querySelectorAll(".editButton");
 let statusCheckbox = document.querySelectorAll(".statusCheckbox");
 let todoTableBody = document.getElementById("todoTableBody");
 
+
+
+
+//--------------------------Hinzufügen--------------------------------------
+// Formular hinzufügen (button)
 addButton.addEventListener("click", () => {
-        //! Handle click event
+//! Handle click event
         todoForm.style.display = "block"; // Formular anzeigen
 });
 
-deleteButton.forEach(element => {
-    element.addEventListener("click", () => {
-        //! Handle click event
-    });
-});
-
-editButton.forEach(element => {
-    element.addEventListener("click", () => {
-        //! Handle click event
-    });
-});
-
-statusCheckbox.forEach(element => {
-    element.addEventListener("change", () => {
-        //! Handle change event
-    });
-});
-
+// Formular speichern (button)
 submitButton.addEventListener("click", (e) => {
     e.preventDefault(); // Verhindert das automatische Neuladen der Seite
     
-    //! Formular absenden
+    // Formular absenden und neues Todo erstellen
     const newTodo = {
         title: titleInput.value,
         description: descriptionInput.value,
@@ -73,17 +61,48 @@ submitButton.addEventListener("click", (e) => {
         status: false
     };
     todos.push(newTodo);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); //! Daten speichern im localStorage
+                                                            //! Nachher muss es mit DB verbunden werden
     renderTodos();
     todoForm.reset();
     todoForm.style.display = "none";
 });
 
+// Formular abbrechen (button) 
 cancelButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    todoForm.reset();
-    todoForm.style.display = "none";
+    e.preventDefault();  // Warten auf Klick
+    todoForm.reset();     // Formular leeren
+    todoForm.style.display = "none"; // Formular ausblenden
 });
+//--------------------------Hinzufügen--------------------------------------
+
+
+
+// Löschen Button
+deleteButton.forEach(element => {
+    element.addEventListener("click", () => {
+        //! Handle click event
+    });
+});
+
+
+// Bearbeiten Button
+editButton.forEach(element => {
+    element.addEventListener("click", () => {
+        //! Handle click event
+    });
+});
+
+
+// Status Checkbox
+statusCheckbox.forEach(element => {
+    element.addEventListener("change", () => {
+        //! Handle change event
+    });
+});
+
+
+
 
 // Datum Berechnung
 function calculateRemainingDays(dueDate) {
