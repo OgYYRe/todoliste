@@ -66,15 +66,15 @@ submitButton.addEventListener("click", (e) => {
     // Formular absenden und neues Task erstellen
     const newTask = {
         title: titleInput.value,
-        description: descriptionInput.value,
-        dueDate: dueDateInput.value,
-        priority: prioritySelect.value,
+        description: descriptionInput.value??"", //hier leer wenn es undefiniert
+        dueDate: dueDateInput.value??"", 
+        priority: priorityInput.value??"low", // Default  "low", wenn leer
         status: false
     };
     console.log("Erhaltene Daten", newTask);  // Debugging: Überprüfen der erhaltenen Daten
 
     const newData = jsonMaker(newTask); // Daten in JSON umwandeln
-    console.log("In JSON umgewandelt", newData); // Debugging: Überprüfen der JSON-Daten
+    console.log("In JSON umgewandelt und new Daten sind; ", newData); // Debugging: Überprüfen der JSON-Daten
 
 
     //----------------- Hier API POST Anfrage -----------------
