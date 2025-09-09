@@ -22,7 +22,7 @@
       <th>Aktionen</th>
     </tr>
   </thead>
-  <tbody id="todoTableBody">
+  <tbody id="taskTableBody">
  <!-- es wird von JS gefüllt -->
   </tbody>
 </table>
@@ -31,8 +31,33 @@
 </section>
     </div>
 
-    
-    
-    <script src="app.js"></script>
+    <!-- verstecktes Form-->
+     <form id="taskForm" style="display: none;">
+      <br><br>
+      <label for="titleInput">Titel:</label>
+      <input type="text" id="titleInput" name="title" required><br><br>
+
+      <label for="descriptionInput">Beschreibung:</label>
+      <input type="text" id="descriptionInput" name="description"><br><br>
+
+      <label for="dueDateInput">Enddatum:</label>
+      <input type="date" id="dueDateInput" name="dueDate"><br><br>
+
+      <label for="priorityInput">Priorität:</label>
+      <select id="priorityInput" name="priority">
+        <option value="low">Niedrig</option>
+        <option value="medium">Mittel</option>
+        <option value="high">Hoch</option>
+      </select><br><br>
+
+      <button for="priorityInput" id="submitButton">Speichern</button>
+      <button type="button" id="cancelButton">Abbrechen</button>
+      <br><br>
+
+      
+     </form>
+
+     <script>window.API_BASE_URL = "http://127.0.0.1:5000";</script>
+     <script src="app.js"></script>
 </body>
 </html>
