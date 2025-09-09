@@ -55,7 +55,7 @@ submitButton.addEventListener("click", (e) => {
         title: titleInput.value,
         description: descriptionInput.value??"", //hier leer wenn es undefiniert
         dueDate: dueDateInput.value??"", 
-        priority: priorityInput.value??"low", // Default  "low", wenn leer
+        priority: prioritySelect.value??"low", // Default  "low", wenn leer
         completed: false
     };
     console.log("Erhaltene Daten", newTask);  // Debugging: Überprüfen der erhaltenen Daten
@@ -100,10 +100,29 @@ cancelButton.addEventListener("click", (e) => {
 // Löschen Button
 deleteButton.forEach(element => {
     element.addEventListener("click", () => {
-        //! Handle click event
+        async function deleteTaskById(id) {
+            try {
+                const response = await fetch(API.deleteTask(id), {
+                    method: "DELETE"
+                });
+                if (!response.ok) throw new Error("Fehler beim Löschen der Aufgabe!");
+                alert(`Aufgabe ${title} erfolgreich gelöscht!`);
+            } catch (error) {
+                console.error("Fehler beim Löschen der Aufgabe:", error);
+                alert("Fehler beim Löschen der Aufgabe. Bitte versuchen Sie es erneut.");
+            }
+        }
     });
 });
 
+
+// Bearbeiten Button
+editButton.forEach(element => {
+    element.addEventListener("click", () => {
+        //! Handle click event
+    });
+});
+    
 
 // Bearbeiten Button
 editButton.forEach(element => {
@@ -161,16 +180,57 @@ async function renderTasks() {
             <input type="checkbox" class="completedCheckbox" ${task.completed ? "checked" : ""}>
             </td>
             <td>
-            <button type="button" class="deleteButton">Löschen</button>
-            <button type="button" class="editButton">Bearbeiten</button>
+            <button type="button" class="deleteButton" data-id="${task.id}">Löschen</button>
+            <button type="button" class="editButton" data-id="${task.id}">Bearbeiten</button>
             </td>
         `;
         taskTableBody.appendChild(row);
     });
-}   catch (error) {
-        console.error("Fehler beim Laden der Aufgaben von der API:", error);
-        alert("Fehler beim Laden der Aufgaben. Bitte versuchen Sie es erneut.");
-    }
+
+    // Event-Listener für Löschen Button
+    document.querySelectorAll(".deleteButton").forEach(btn => {
+        btn.addEventListener("click", async function() {
+            const id = this.getAttribute("data-id");
+            try {
+                const response = await fetch(API.deleteTask(id), { method: "DELETE" });
+                if (!response.ok) throw new Error("Fehler beim Löschen der Aufgabe!");
+                alert("Aufgabe erfolgreich gelöscht!");
+                renderTasks(); // Tabelle aktualisieren nach dem Löschen   
+            } catch (error) {
+                alert("Fehler beim Löschen der Aufgabe. Bitte versuchen Sie es erneut.");
+                console.error("Fehler beim Löschen der Aufgabe:", error);
+            }
+        });
+    });
+
+    // Event-Listener für Bearbeiten Button
+    document.querySelectorAll(".editButton").forEach(btn => {
+        btn.addEventListener("click", async function() {
+            const id = this.getAttribute("data-id");
+            // Hier können Sie den Bearbeitungsprozess implementieren
+        });
+    });
+
+    // Event-Listener für die Checkbox "completed"
+    document.querySelectorAll(".completedCheckbox").forEach(checkbox => {
+        checkbox.addEventListener("change", async function() {
+            const id = this.closest("tr").querySelector(".editButton").getAttribute("data-id");
+            const completed = this.checked;
+            try {
+                const response = await fetch(API.updateTask(id, { completed }), { method: "PUT" });
+                if (!response.ok) throw new Error("Fehler beim Aktualisieren der Aufgabe!");
+                renderTasks(); // Tabelle aktualisieren nach dem Ändern des Status
+            } catch (error) {
+                alert("Fehler beim Aktualisieren der Aufgabe. Bitte versuchen Sie es erneut.");
+                console.error("Fehler beim Aktualisieren der Aufgabe:", error);
+            }
+        });
+    });
+
+} catch (error) {
+    console.error("Fehler beim Laden der Aufgaben von der API:", error);
+    alert("Fehler beim Laden der Aufgaben. Bitte versuchen Sie es erneut.");
+}
 }
 
 renderTasks();
