@@ -1,7 +1,4 @@
-//! zumleeren -> im console localStorage.clear()
-
 const API_BASE_URL = (window.API_BASE_URL || "http://127.0.0.1:5000"); // URL der API, später anpassen 
-
 
 // endpoint mapping -> hier werden die Endpunkte der API definiert
 const API={
@@ -20,20 +17,8 @@ function jsonMaker(data) {
 
 
 
-// //hier laden oder leer array
-// let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-// // beispieldaten
-// if (tasks.length === 0) {
-//   tasks = [
-//     { id: 1, title: "Testaufgabe1", description: "nur zum testen1", dueDate: "2025-09-01", priority: "low", completed: false },
-//     { id: 2, title: "Testaufgabe2", description: "nur zum testen2", dueDate: "2026-09-01", priority: "medium", completed: false }
-//   ];
-//   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-// }
-
-
-
+//--------------------------Variablen--------------------------------------
 let addButton = document.querySelector(".addButton");
 
 let taskForm = document.getElementById("taskForm"); // Formular Anzeige
@@ -45,6 +30,7 @@ let prioritySelect = document.getElementById("prioritySelect");
 let submitButton = document.getElementById("submitButton");
 let cancelButton = document.getElementById("cancelButton");
 
+//----Buttons
 let deleteButton = document.querySelectorAll(".deleteButton");
 let editButton = document.querySelectorAll(".editButton");
 let completedCheckbox = document.querySelectorAll(".completedCheckbox");
@@ -53,7 +39,7 @@ let taskTableBody = document.getElementById("taskTableBody");
 
 
 
-//--------------------------Hinzufügen--------------------------------------
+//--------------------------HinzufügenButton--------------------------------------
 // Formular hinzufügen (button)
 addButton.addEventListener("click", () => {
 //! Handle click event
@@ -78,7 +64,7 @@ submitButton.addEventListener("click", (e) => {
     console.log("In JSON umgewandelt und new Daten sind; ", newData); // Debugging: Überprüfen der JSON-Daten
 
 
-    //----------------- Hier API POST Anfrage -----------------
+    //-------------------------API POST Anfrage -----------------
         // Nur POST-Anfrage senden
         (async () => {
             try {
@@ -99,14 +85,7 @@ submitButton.addEventListener("click", (e) => {
             }
         })();
 
-    // //! es wird värandert
-    // tasks.push(newTask);
-    // localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); //! Daten speichern im localStorage
-    //                                                         //! Nachher muss es mit DB verbunden werden
-    // rendertasks();
-    // taskForm.reset();
-    // taskForm.style.display = "none";
-});
+});//-------------------------API POST---------------------------------
 
 // Formular abbrechen (button) 
 cancelButton.addEventListener("click", (e) => {
