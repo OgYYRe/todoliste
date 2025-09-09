@@ -1,11 +1,12 @@
 //! zumleeren -> im console localStorage.clear()
 
-const API_BASE_URL = (window.API_BASE_URL || "http://localhost:5500/api"); // URL der API, später anpassen 
+const API_BASE_URL = (window.API_BASE_URL || "http://127.0.0.1:5000"); // URL der API, später anpassen 
 
 
 // endpoint mapping -> hier werden die Endpunkte der API definiert
 const API={
-    listTasks: () => `${API_BASE_URL}/tasks`, // GET alle Tasks
+    getAllTasks: () => `${API_BASE_URL}/`, // GET alle Tasks
+    getTaskById: (id) => `${API_BASE_URL}/task/${id}`, // GET Task nach ID
     createTask: () => `${API_BASE_URL}/task`, // POST neues Task
     updateTask: (id) => `${API_BASE_URL}/task/${id}`, // PUT Task aktualisieren
     deleteTask: (id) => `${API_BASE_URL}/task/${id}` // DELETE Task löschen
@@ -25,8 +26,8 @@ function jsonMaker(data) {
 // // beispieldaten
 // if (tasks.length === 0) {
 //   tasks = [
-//     { id: 1, title: "Testaufgabe1", description: "nur zum testen1", dueDate: "2025-09-01", priority: "low", status: false },
-//     { id: 2, title: "Testaufgabe2", description: "nur zum testen2", dueDate: "2026-09-01", priority: "medium", status: false }
+//     { id: 1, title: "Testaufgabe1", description: "nur zum testen1", dueDate: "2025-09-01", priority: "low", completed: false },
+//     { id: 2, title: "Testaufgabe2", description: "nur zum testen2", dueDate: "2026-09-01", priority: "medium", completed: false }
 //   ];
 //   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 // }
@@ -46,7 +47,7 @@ let cancelButton = document.getElementById("cancelButton");
 
 let deleteButton = document.querySelectorAll(".deleteButton");
 let editButton = document.querySelectorAll(".editButton");
-let statusCheckbox = document.querySelectorAll(".statusCheckbox");
+let completedCheckbox = document.querySelectorAll(".completedCheckbox");
 let taskTableBody = document.getElementById("taskTableBody");
 
 
@@ -69,7 +70,7 @@ submitButton.addEventListener("click", (e) => {
         description: descriptionInput.value??"", //hier leer wenn es undefiniert
         dueDate: dueDateInput.value??"", 
         priority: priorityInput.value??"low", // Default  "low", wenn leer
-        status: false
+        completed: false
     };
     console.log("Erhaltene Daten", newTask);  // Debugging: Überprüfen der erhaltenen Daten
 
@@ -133,8 +134,8 @@ editButton.forEach(element => {
 });
 
 
-// Status Checkbox
-statusCheckbox.forEach(element => {
+// completed Checkbox
+completedCheckbox.forEach(element => {
     element.addEventListener("change", () => {
         //! Handle change event
     });
@@ -154,27 +155,31 @@ function calculateRemainingDays(dueDate) {
      return daysDiff > 0 ? `${daysDiff} Tage` : "Frist abgelaufen";
 }
 
-// render funktion für Anzeige der Tabelle
-function rendertasks() {
-    taskTableBody.innerHTML = "";
+// render funktion für Anzeige der Tabelle von DB
+async function renderTasks() {
+    try {
+        //GET alle Tasks 
+        const response = await fetch(API.getAllTasks());
+        if (!response.ok) throw new Error("Fehler beim Laden der Aufgaben von der API");
+
+        const data = await response.json();
+        const tasks = data.tasks || []; // Sicherstellen, dass tasks ein Array ist
+        console.log("Geladene Aufgaben:", tasks); // Debugging: Überprüfen der geladenen Aufgaben
+
+        taskTableBody.innerHTML = ""; // Tabelle leeren
+
+    // Tabelle füllen
     tasks.forEach((task, index) => {
-        const title = task.title ?? "";              //hier leer wenn es undefiniert
-        const description = task.description ?? "";  
-        const dueDate = task.dueDate ?? "";          
-        const priority = task.priority ?? "";        
-        const daysLeft = calculateRemainingDays(task.dueDate); 
-
-
         let row = document.createElement("tr");
         row.innerHTML = `
             <td>${index + 1}</td>
-            <td>${title}</td>
-            <td>${description}</td>
-            <td>${dueDate}</td>
-            <td>${daysLeft}</td>  
-            <td>${priority}</td>
+            <td>${task.title ?? "Kein Titel"}</td>
+            <td>${task.description ?? "Keine Beschreibung"}</td>
+            <td>${task.dueDate ?? "Kein Fälligkeitsdatum"}</td>
+            <td>${task.daysLeft ?? "Keine verbleibenden Tage"}</td>
+            <td>${task.priority ?? "Keine Priorität"}</td>
             <td>
-            <input type="checkbox" class="statusCheckbox" ${task.status ? "checked" : ""}>
+            <input type="checkbox" class="completedCheckbox" ${task.completed ? "checked" : ""}>
             </td>
             <td>
             <button type="button" class="deleteButton">Löschen</button>
@@ -183,7 +188,11 @@ function rendertasks() {
         `;
         taskTableBody.appendChild(row);
     });
+}   catch (error) {
+        console.error("Fehler beim Laden der Aufgaben von der API:", error);
+        alert("Fehler beim Laden der Aufgaben. Bitte versuchen Sie es erneut.");
+    }
 }
 
-rendertasks();
+renderTasks();
 
