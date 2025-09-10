@@ -25,7 +25,7 @@ let taskForm = document.getElementById("taskForm"); // Formular Anzeige
 
 let titleInput = document.getElementById("titleInput");
 let descriptionInput = document.getElementById("descriptionInput");
-let dueDateInput = document.getElementById("dueDateInput");
+let due_dateInput = document.getElementById("due_dateInput");
 let prioritySelect = document.getElementById("prioritySelect");
 let submitButton = document.getElementById("submitButton");
 let cancelButton = document.getElementById("cancelButton");
@@ -141,10 +141,10 @@ completedCheckbox.forEach(element => {
 
 
 // Datum Berechnung
-function calculateRemainingDays(dueDate) {
-    if (!dueDate) return ""; //hier leer wenn kein datum
+function calculateRemainingDays(due_date) {
+    if (!due_date) return ""; //hier leer wenn kein datum
     const today = new Date();
-    const due = new Date(dueDate);
+    const due = new Date(due_date);
     if (isNaN(due.getTime())) return ""; //hier leer wenn ungueltig
     const timeDiff = due - today;
     const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
@@ -171,7 +171,7 @@ async function renderTasks() {
             <td>${index + 1}</td>
             <td>${task.title ?? "Kein Titel"}</td>
             <td>${task.description ?? "Keine Beschreibung"}</td>
-            <td>${task.dueDate ?? "Kein Fälligkeitsdatum"}</td>
+            <td>${task.due_date ?? "Kein Fälligkeitsdatum"}</td>
             <td>${task.daysLeft ?? "Keine verbleibenden Tage"}</td>
             <td>${task.priority ?? "Keine Priorität"}</td>
             <td>
@@ -207,7 +207,20 @@ async function renderTasks() {
     document.querySelectorAll(".editButton").forEach(btn => {
         btn.addEventListener("click", async function() {
             const id = this.getAttribute("data-id");
-            // Hier können Sie den Bearbeitungsprozess implementieren
+            const response = await fetch(API.getTaskById(id));
+            if (!response.ok) {
+                alert("Fehler beim Laden der Aufgabe. Bitte versuchen Sie es erneut.");
+                return;
+            }
+
+            const task = await response.json();
+            // Formular mit den aktuellen Werten füllen
+            //! Ich muss mit ID arbeiten aber nicht ändern+anzeigen
+            titleInput.value = task.title ?? "";
+            descriptionInput.value = task.description ?? "";
+            due_dateInput.value = task.due_date ?? "";
+            prioritySelect.value = task.priority ?? "low";
+            taskForm.style.display = "block"; // Formular anzeigen
         });
     });
 
