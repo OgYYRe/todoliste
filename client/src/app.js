@@ -54,7 +54,7 @@ submitButton.addEventListener("click", (e) => {
     const newTask = {
         title: titleInput.value,
         description: descriptionInput.value??"", //hier leer wenn es undefiniert
-        dueDate: dueDateInput.value??"", 
+        due_date: due_date.value??"", 
         priority: prioritySelect.value??"low", // Default  "low", wenn leer
         completed: false
     };
@@ -62,8 +62,6 @@ submitButton.addEventListener("click", (e) => {
 
     const newData = jsonMaker(newTask); // Daten in JSON umwandeln
     console.log("In JSON umgewandelt und new Daten sind; ", newData); // Debugging: Überprüfen der JSON-Daten
-
-
     //-------------------------API POST Anfrage -----------------
         // Nur POST-Anfrage senden
         (async () => {
@@ -191,6 +189,8 @@ async function renderTasks() {
     document.querySelectorAll(".deleteButton").forEach(btn => {
         btn.addEventListener("click", async function() {
             const id = this.getAttribute("data-id");
+            const confirmed = confirm("Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?");  //Kontrollfrage
+            if (!confirmed) return;
             try {
                 const response = await fetch(API.deleteTask(id), { method: "DELETE" });
                 if (!response.ok) throw new Error("Fehler beim Löschen der Aufgabe!");
