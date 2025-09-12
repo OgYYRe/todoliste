@@ -7,7 +7,6 @@ const API={
     createTask: () => `${API_BASE_URL}/task`, // POST neues Task
     updateTask: (id) => `${API_BASE_URL}/task/${id}`, // PUT Task aktualisieren
     deleteTask: (id) => `${API_BASE_URL}/task/${id}` // DELETE Task löschen
-    //?healthCheck: () => `${API_BASE_URL}/health` // GET Gesundheitscheck (optional)
 };
 
 // Daten in JSON umwandeln
@@ -23,6 +22,8 @@ let addButton = document.querySelector(".addButton");
 
 let taskForm = document.getElementById("taskForm"); // Formular Anzeige
 
+
+//----Formular Inputs
 let titleInput = document.getElementById("titleInput");
 let descriptionInput = document.getElementById("descriptionInput");
 let due_dateInput = document.getElementById("due_dateInput");
@@ -31,8 +32,6 @@ let submitButton = document.getElementById("submitButton");
 let cancelButton = document.getElementById("cancelButton");
 
 //----Buttons
-let deleteButton = document.querySelectorAll(".deleteButton");
-let editButton = document.querySelectorAll(".editButton");
 let completedCheckbox = document.querySelectorAll(".completedCheckbox");
 let taskTableBody = document.getElementById("taskTableBody");
 
@@ -52,6 +51,7 @@ submitButton.addEventListener("click", (e) => {
 
     // Formular absenden und neues Task erstellen
     const newTask = {
+        //id: idInput.value, //! ID muss von der Backend-API generiert werden
         title: titleInput.value,
         description: descriptionInput.value??"", //hier leer wenn es undefiniert
         due_date: due_date.value??"", 
@@ -60,8 +60,6 @@ submitButton.addEventListener("click", (e) => {
     };
     console.log("Erhaltene Daten", newTask);  // Debugging: Überprüfen der erhaltenen Daten
 
-    const newData = jsonMaker(newTask); // Daten in JSON umwandeln
-    console.log("In JSON umgewandelt und new Daten sind; ", newData); // Debugging: Überprüfen der JSON-Daten
     //-------------------------API POST Anfrage -----------------
         // Nur POST-Anfrage senden
         (async () => {
@@ -93,49 +91,6 @@ cancelButton.addEventListener("click", (e) => {
 });
 //--------------------------Hinzufügen--------------------------------------
 
-
-
-// Löschen Button
-deleteButton.forEach(element => {
-    element.addEventListener("click", () => {
-        async function deleteTaskById(id) {
-            try {
-                const response = await fetch(API.deleteTask(id), {
-                    method: "DELETE"
-                });
-                if (!response.ok) throw new Error("Fehler beim Löschen der Aufgabe!");
-                alert(`Aufgabe ${title} erfolgreich gelöscht!`);
-            } catch (error) {
-                console.error("Fehler beim Löschen der Aufgabe:", error);
-                alert("Fehler beim Löschen der Aufgabe. Bitte versuchen Sie es erneut.");
-            }
-        }
-    });
-});
-
-
-// Bearbeiten Button
-editButton.forEach(element => {
-    element.addEventListener("click", () => {
-        //! Handle click event
-    });
-});
-    
-
-// Bearbeiten Button
-editButton.forEach(element => {
-    element.addEventListener("click", () => {
-        //! Handle click event
-    });
-});
-
-
-// completed Checkbox
-completedCheckbox.forEach(element => {
-    element.addEventListener("change", () => {
-        //! Handle change event
-    });
-});
 
 
 
@@ -175,7 +130,7 @@ async function renderTasks() {
             <td>${task.daysLeft ?? "Keine verbleibenden Tage"}</td>
             <td>${task.priority ?? "Keine Priorität"}</td>
             <td>
-            <input type="checkbox" class="completedCheckbox" ${task.completed ? "checked" : ""}>
+            <input type="checkbox" class="completedCheckbox" ${(task.status !== "Open") ? "checked" : ""}>
             </td>
             <td>
             <button type="button" class="deleteButton" data-id="${task.id}">Löschen</button>
@@ -190,6 +145,7 @@ async function renderTasks() {
         btn.addEventListener("click", async function() {
             const id = this.getAttribute("data-id");
             const confirmed = confirm("Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?");  //Kontrollfrage
+            console.log("id:", id);
             if (!confirmed) return;
             try {
                 const response = await fetch(API.deleteTask(id), { method: "DELETE" });
