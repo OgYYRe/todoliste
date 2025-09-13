@@ -18,8 +18,8 @@ function jsonMaker(data) {
 
 
 //--------------------------Variablen--------------------------------------
+let editTaskId = null; // Variable zum Speichern der ID der zu bearbeitenden Aufgabe
 let addButton = document.querySelector(".addButton");
-
 let taskForm = document.getElementById("taskForm"); // Formular Anzeige
 
 
@@ -27,7 +27,7 @@ let taskForm = document.getElementById("taskForm"); // Formular Anzeige
 let titleInput = document.getElementById("titleInput");
 let descriptionInput = document.getElementById("descriptionInput");
 let due_dateInput = document.getElementById("due_dateInput");
-let prioritySelect = document.getElementById("prioritySelect");
+let priorityInput = document.getElementById("priorityInput");
 let submitButton = document.getElementById("submitButton");
 let cancelButton = document.getElementById("cancelButton");
 
@@ -54,8 +54,8 @@ submitButton.addEventListener("click", (e) => {
         //id: idInput.value, //! ID muss von der Backend-API generiert werden
         title: titleInput.value,
         description: descriptionInput.value??"", //hier leer wenn es undefiniert
-        due_date: due_date.value??"", 
-        priority: prioritySelect.value??"low", // Default  "low", wenn leer
+        due_dateInput: due_dateInput.value??"", 
+        priority: priorityInput.value??"low", // Default  "low", wenn leer
         completed: false
     };
     console.log("Erhaltene Daten", newTask);  // Debugging: Überprüfen der erhaltenen Daten
@@ -96,10 +96,10 @@ cancelButton.addEventListener("click", (e) => {
 
 
 // Datum Berechnung
-function calculateRemainingDays(due_date) {
-    if (!due_date) return ""; //hier leer wenn kein datum
+function calculateRemainingDays(due_dateInput) {
+    if (!due_dateInput) return ""; //hier leer wenn kein datum
     const today = new Date();
-    const due = new Date(due_date);
+    const due = new Date(due_dateInput);
     if (isNaN(due.getTime())) return ""; //hier leer wenn ungueltig
     const timeDiff = due - today;
     const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
@@ -140,7 +140,7 @@ async function renderTasks() {
         taskTableBody.appendChild(row);
     });
 
-    // Event-Listener für Löschen Button
+    // Event-Listener für Löschen Button done
     document.querySelectorAll(".deleteButton").forEach(btn => {
         btn.addEventListener("click", async function() {
             const id = this.getAttribute("data-id");
@@ -171,11 +171,13 @@ async function renderTasks() {
 
             const task = await response.json();
             // Formular mit den aktuellen Werten füllen
-            //! Ich muss mit ID arbeiten aber nicht ändern+anzeigen
+            editTaskId = id; // Speichern der ID der zu bearbeitenden Aufgabe
+            console.log("Zu bearbeitende Aufgabe ID:", editTaskId); // Debugging: Überprüfen der ID
+            //! ID 
             titleInput.value = task.title ?? "";
             descriptionInput.value = task.description ?? "";
             due_dateInput.value = task.due_date ?? "";
-            prioritySelect.value = task.priority ?? "low";
+            priorityInput.value = task.priority ?? "Low";
             taskForm.style.display = "block"; // Formular anzeigen
         });
     });
