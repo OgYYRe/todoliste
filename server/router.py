@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from services import (
     getAllTasks,
@@ -14,46 +14,78 @@ app = Flask(__name__)
 CORS(app)
 
 
+# GET: alle
 @app.route("/", methods=["GET"])
 def home():
-    results = getAllTasks()
-    return {"tasks": results.data}
+    response = getAllTasks()
+    return jsonify(response.data), 200
 
 
+# GET: by id
 @app.route("/task/<int:task_id>", methods=["GET"])
-def get_task(task_id: int):
-    results = getTaskById(task_id)
-    return {"task": results.data}
+def get_task(task_id):
+    response = getTaskById(task_id)
+    if response.data:
+        return jsonify(response.data[0]), 200
+    else:
+        return jsonify({"error": "Task not found"}), 404
 
 
-@app.route("/task/create/<int:task_id>", methods=["POST"])
-def create_task(task: dict):
-    results = createTask(task)
-    return {"task created": results.data}
+# POST: create
+@app.route("/task", methods=["POST"])
+def create_task():
+    data = request.json or {}
+    response = createTask(data)
+    if response.data:
+        return jsonify(response.data[0]), 201
+    else:
+        return jsonify({"error": "Task not created"}), 400
 
 
-@app.route("/task/update/<int:task_id>", methods=["PUT"])
-def update_task(task_id: int, updates: dict):
-    results = updateTask(task_id, updates)
-    return {"task updated": results.data}
+# PUT: update
+@app.route("/task/<int:task_id>", methods=["PUT"])
+def update_task(task_id):
+    updates = request.json or {}
+    response = updateTask(task_id, updates)
+    if response.data:
+        return jsonify(response.data[0]), 200
+    else:
+        return jsonify({"error": "Task not updated"}), 400
 
 
-@app.route("/task/delete/<int:task_id>", methods=["DELETE"])
-def delete_task(task_id: int):
-    deleteTask(task_id)
-    return {"task deleted": task_id}
+# DELETE: delete
+@app.route("/task/<int:task_id>", methods=["DELETE", "OPTIONS"])
+def delete_task(task_id):
+    print(f"DELETE /task/{task_id} aufgerufen")
+    if request.method == "OPTIONS":
+        print("OPTIONS request erhalten")
+        return "", 200
+    response = deleteTask(task_id)
+    print("Supabase response:", response.data)
+    if response.data:
+        return jsonify({"success": True}), 200
+    else:
+        return jsonify({"error": "Task not found"}), 404
 
 
-@app.route("/task/complete/<int:task_id>", methods=["PUT"])
-def complete_task(task_id: int):
-    results = setCompleted(task_id)
-    return {"task completed": results.data}
+# PUT: mark as completed
+@app.route("/task/<int:task_id>/complete", methods=["PUT"])
+def complete_task(task_id):
+    response = setCompleted(task_id)
+    if response.data:
+        return jsonify(response.data[0]), 200
+    else:
+        return jsonify({"error": "Task not updated"}), 400
 
 
-@app.route("/task/uncomplete/<int:task_id>", methods=["PUT"])
-def uncomplete_task(task_id: int):
-    results = unsetCompleted(task_id)
-    return {"task uncompleted": results.data}
+# PUT: mark as uncompleted
+@app.route("/task/<int:task_id>/uncomplete", methods=["PUT"])
+def uncomplete_task(task_id):
+    response = unsetCompleted(task_id)
+    if response.data:
+        return jsonify(response.data[0]), 200
+    else:
+        return jsonify({"error": "Task not updated"}), 400
 
 
 if __name__ == "__main__":
