@@ -1,4 +1,4 @@
-from server.src.config import supabase
+from config import supabase
 
 
 def getAllTasks():
@@ -26,6 +26,20 @@ def deleteTask(task_id: int):
     return response
 
 
+def setCompleted(task_id: int):
+    response = (
+        supabase.table("tasks").update({"completed": True}).eq("id", task_id).execute()
+    )
+    return response
+
+
+def unsetCompleted(task_id: int):
+    response = (
+        supabase.table("tasks").update({"completed": False}).eq("id", task_id).execute()
+    )
+    return response
+
+
 # Example usage (for testing purposes)
 if __name__ == "__main__":
     print(getAllTasks())
@@ -33,9 +47,9 @@ if __name__ == "__main__":
     new_task = {
         "title": "New Task",
         "description": "This is a new task",
-        "completed": False,
+        "status": "pending",
     }
     print(createTask(new_task))
-    updates = {"completed": True}
+    updates = {"status": "Done"}
     print(updateTask(1, updates))
     print(deleteTask(1))
