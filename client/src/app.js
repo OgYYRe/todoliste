@@ -67,7 +67,7 @@ createButton.addEventListener("click", (e) => {
         //! ID muss von der Backend-API generiert werden
         title: titleInput.value,
         description: descriptionInput.value??"", //hier leer wenn es undefiniert
-        due_date: due_dateInput.value??"", 
+        due_date: due_dateInput.value === "" ? null : due_dateInput.value, 
         priority: priorityInput.value??"Low", // Default  "Low", wenn leer
         completed: false
     };
@@ -84,14 +84,14 @@ createButton.addEventListener("click", (e) => {
                     },
                     body: jsonMaker(newTask)
                 });
-                if (!response.ok) throw new Error("Fehler beim Speichern der Aufgabe!");
+                if (!response.ok) throw new Error("Fehler beim Speichern der Aufgabe!", newTask);
                 alert("Task erfolgreich gespeichert!");
                 taskForm.reset();
                 taskForm.style.display = "none";
                 renderTasks(); // Tabelle aktualisieren nach dem Hinzufügen
             } catch (error) {
-                console.error("Fehler beim Senden der Daten an die API:", error);
-                alert(error.message || "Fehler beim Speichern der Aufgabe. Bitte versuchen Sie es erneut.");
+                console.error("Fehler beim Senden der Daten an die API:", error, newTask);
+                alert(error.message || "Fehler beim Speichern der Aufgabe. Bitte versuchen Sie es erneut.", newTask);
             }
         })();
 
@@ -203,7 +203,13 @@ async function renderTasks() {
             const id = this.closest("tr").querySelector(".updateButton").getAttribute("data-id");
             const completed = this.checked;
             try {
-                const response = await fetch(API.updateTask(id, { completed }), { method: "PUT" });
+                const response = await fetch(API.updateTask(id), {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ completed })
+                }); // wichtig: Body mitsenden
                 if (!response.ok) throw new Error("Fehler beim Aktualisieren der Aufgabe!");
                 renderTasks(); // Tabelle aktualisieren nach dem Ändern des Status
             } catch (error) {
