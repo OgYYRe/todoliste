@@ -49,15 +49,18 @@
         <option value="Medium">Mittel</option>
         <option value="High">Hoch</option>
       </select><br><br>
-      <button for="priorityInput" id="submitButton">Speichern</button>
+
+
+      <button type="button" id="createButton">Neuen Task erstellen</button>
+      <button type="button" id="updateButton" style="display:none;">Bearbeitung Speichern</button>
       <button type="button" id="cancelButton">Abbrechen</button>
       
       <br><br>
 
       
      </form>
-
      <script>window.API_BASE_URL = "http://127.0.0.1:5000";</script>
+
      <script src="app.js"></script>
 </body>
 </html>

@@ -14,6 +14,16 @@ function jsonMaker(data) {
     return JSON.stringify(data);
 }
 
+// Priorität Label Funktion
+function getPriorityLabel(priority) {
+    switch (priority ?? "") {
+        case "Low": return "Niedrig";
+        case "Medium": return "Mittel";
+        case "High": return "Hoch";
+        default: return "Keine Priorität";
+    }
+}
+
 
 
 
@@ -28,7 +38,8 @@ let titleInput = document.getElementById("titleInput");
 let descriptionInput = document.getElementById("descriptionInput");
 let due_dateInput = document.getElementById("due_dateInput");
 let priorityInput = document.getElementById("priorityInput");
-let submitButton = document.getElementById("submitButton");
+let createButton = document.getElementById("createButton");
+let updateButton = document.getElementById("updateButton");
 let cancelButton = document.getElementById("cancelButton");
 
 //----Buttons
@@ -39,23 +50,25 @@ let taskTableBody = document.getElementById("taskTableBody");
 
 
 //--------------------------HinzufügenButton--------------------------------------
-// Formular hinzufügen (button)
+    // Formular hinzufügen (button)
 addButton.addEventListener("click", () => {
-//! Handle click event
+        taskForm.reset(); // Formular leeren
         taskForm.style.display = "block"; // Formular anzeigen
+        createButton.style.display = "block"; // Hinzufügen-Button anzeigen
+        updateButton.style.display = "none"; // Update-Button ausblenden
 });
 
-// Formular speichern (button)
-submitButton.addEventListener("click", (e) => {
+    // Neuen Task erstellen (button)
+createButton.addEventListener("click", (e) => {
     e.preventDefault(); // Verhindert das automatische Neuladen der Seite
 
     // Formular absenden und neues Task erstellen
     const newTask = {
-        //id: idInput.value, //! ID muss von der Backend-API generiert werden
+        //! ID muss von der Backend-API generiert werden
         title: titleInput.value,
         description: descriptionInput.value??"", //hier leer wenn es undefiniert
-        due_dateInput: due_dateInput.value??"", 
-        priority: priorityInput.value??"low", // Default  "low", wenn leer
+        due_date: due_dateInput.value??"", 
+        priority: priorityInput.value??"Low", // Default  "Low", wenn leer
         completed: false
     };
     console.log("Erhaltene Daten", newTask);  // Debugging: Überprüfen der erhaltenen Daten
@@ -75,13 +88,14 @@ submitButton.addEventListener("click", (e) => {
                 alert("Task erfolgreich gespeichert!");
                 taskForm.reset();
                 taskForm.style.display = "none";
+                renderTasks(); // Tabelle aktualisieren nach dem Hinzufügen
             } catch (error) {
                 console.error("Fehler beim Senden der Daten an die API:", error);
                 alert(error.message || "Fehler beim Speichern der Aufgabe. Bitte versuchen Sie es erneut.");
             }
         })();
 
-});//-------------------------API POST---------------------------------
+});//-------------------------API POST endpoint---------------------------------
 
 // Formular abbrechen (button) 
 cancelButton.addEventListener("click", (e) => {
@@ -90,7 +104,6 @@ cancelButton.addEventListener("click", (e) => {
     taskForm.style.display = "none"; // Formular ausblenden
 });
 //--------------------------Hinzufügen--------------------------------------
-
 
 
 
@@ -114,7 +127,7 @@ async function renderTasks() {
         if (!response.ok) throw new Error("Fehler beim Laden der Aufgaben von der API");
 
         const data = await response.json();
-        const tasks = data.tasks || []; // Sicherstellen, dass tasks ein Array ist
+        const tasks = Array.isArray(data) ? data : (data.tasks || []); //hier beide fälle
         console.log("Geladene Aufgaben:", tasks); // Debugging: Überprüfen der geladenen Aufgaben
 
         taskTableBody.innerHTML = ""; // Tabelle leeren
@@ -127,14 +140,14 @@ async function renderTasks() {
             <td>${task.title ?? "Kein Titel"}</td>
             <td>${task.description ?? "Keine Beschreibung"}</td>
             <td>${task.due_date ?? "Kein Fälligkeitsdatum"}</td>
-            <td>${task.daysLeft ?? "Keine verbleibenden Tage"}</td>
-            <td>${task.priority ?? "Keine Priorität"}</td>
+            <td>${calculateRemainingDays(task.due_date)}</td>
+            <td>${getPriorityLabel(task.priority) ?? "Keine Priorität"}</td>
             <td>
-            <input type="checkbox" class="completedCheckbox" ${(task.status !== "Open") ? "checked" : ""}>
+            <input type="checkbox" class="completedCheckbox" ${task.completed ? "checked" : ""}>
             </td>
             <td>
             <button type="button" class="deleteButton" data-id="${task.id}">Löschen</button>
-            <button type="button" class="editButton" data-id="${task.id}">Bearbeiten</button>
+            <button type="button" class="updateButton" data-id="${task.id}">Bearbeiten</button>
             </td>
         `;
         taskTableBody.appendChild(row);
@@ -160,7 +173,7 @@ async function renderTasks() {
     });
 
     // Event-Listener für Bearbeiten Button
-    document.querySelectorAll(".editButton").forEach(btn => {
+    document.querySelectorAll(".updateButton").forEach(btn => {
         btn.addEventListener("click", async function() {
             const id = this.getAttribute("data-id");
             const response = await fetch(API.getTaskById(id));
@@ -176,16 +189,18 @@ async function renderTasks() {
             //! ID 
             titleInput.value = task.title ?? "";
             descriptionInput.value = task.description ?? "";
-            due_dateInput.value = task.due_date ?? "";
+            due_dateInput.value = (task.due_date ?? "").slice(0, 10); // Formatieren für input type date
             priorityInput.value = task.priority ?? "Low";
             taskForm.style.display = "block"; // Formular anzeigen
+            createButton.style.display = "none"; // Hinzufügen-Button ausblenden
+            updateButton.style.display = "block"; // Update-Button anzeigen
         });
     });
 
     // Event-Listener für die Checkbox "completed"
     document.querySelectorAll(".completedCheckbox").forEach(checkbox => {
         checkbox.addEventListener("change", async function() {
-            const id = this.closest("tr").querySelector(".editButton").getAttribute("data-id");
+            const id = this.closest("tr").querySelector(".updateButton").getAttribute("data-id");
             const completed = this.checked;
             try {
                 const response = await fetch(API.updateTask(id, { completed }), { method: "PUT" });
