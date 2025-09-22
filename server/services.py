@@ -61,28 +61,6 @@ def deleteTask(task_id: int, user_id: str):
     return response
 
 
-def setCompleted(task_id: int, user_id: str):
-    response = (
-        supabase.table("tasks")
-        .update({"completed": True})
-        .eq("id", task_id)
-        .eq("user_id", user_id)
-        .execute()
-    )
-    return response
-
-
-def unsetCompleted(task_id: int, user_id: str):
-    response = (
-        supabase.table("tasks")
-        .update({"completed": False})
-        .eq("id", task_id)
-        .eq("user_id", user_id)
-        .execute()
-    )
-    return response
-
-
 # Example usage (for testing purposes)
 if __name__ == "__main__":
     # print(getAllTasks())

@@ -6,8 +6,6 @@ from services import (
     createTask,
     updateTask,
     deleteTask,
-    setCompleted,
-    unsetCompleted,
     require_user_id,
 )
 
@@ -71,28 +69,6 @@ def delete_task(task_id):
         return jsonify({"success": True}), 200
     else:
         return jsonify({"error": "Task not found"}), 404
-
-
-# PUT: mark as completed
-@app.route("/task/<int:task_id>/complete", methods=["PUT"])
-def complete_task(task_id):
-    user_id = require_user_id()
-    response = setCompleted(task_id, user_id)
-    if response.data:
-        return jsonify(response.data[0]), 200
-    else:
-        return jsonify({"error": "Task not updated"}), 400
-
-
-# PUT: mark as uncompleted
-@app.route("/task/<int:task_id>/uncomplete", methods=["PUT"])
-def uncomplete_task(task_id):
-    user_id = require_user_id()
-    response = unsetCompleted(task_id, user_id)
-    if response.data:
-        return jsonify(response.data[0]), 200
-    else:
-        return jsonify({"error": "Task not updated"}), 400
 
 
 if __name__ == "__main__":
