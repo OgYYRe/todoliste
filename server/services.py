@@ -1,10 +1,14 @@
 from config import supabase
-from flask import jsonify, request
+from flask import jsonify
 import uuid
+from dotenv import load_dotenv
+import os
+
+load_dotenv(dotenv_path="server/.env")
 
 
 def require_user_id():
-    uid = (request.json or {}).get("user_id") if request.is_json else None
+    uid = os.environ.get("USER_ID")
     try:
         return str(uuid.UUID(uid))
     except Exception:
@@ -81,14 +85,13 @@ def unsetCompleted(task_id: int, user_id: str):
 
 # Example usage (for testing purposes)
 if __name__ == "__main__":
-    print(getAllTasks())
-    print(getTaskById(1))
+    # print(getAllTasks())
+    # print(getTaskById(1))
     new_task = {
         "title": "New Task",
         "description": "This is a new task",
-        "status": "pending",
     }
     print(createTask(new_task))
-    updates = {"status": "Done"}
-    print(updateTask(1, updates))
-    print(deleteTask(1))
+    # updates = {"status": "Done"}
+    # print(updateTask(1, updates))
+    # print(deleteTask(1))
