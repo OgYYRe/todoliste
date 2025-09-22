@@ -1,0 +1,392 @@
+form#taskForm {
+  max-width: 600px;
+  margin: 32px auto 0 auto;
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(2,6,23,0.08);
+  border: 1px solid var(--border);
+  padding: 24px 28px 18px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+form#taskForm label {
+  margin-bottom: 4px;
+}
+
+form#taskForm input[type="text"],
+form#taskForm input[type="date"],
+form#taskForm select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 15px;
+  padding: 8px 10px;
+  margin-bottom: 0;
+}
+
+form#taskForm button {
+  min-width: 160px;
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  form#taskForm {
+    max-width: 98vw;
+    padding: 12px 4vw 10px 4vw;
+  }
+}
+/* 1.  Rozetleri */
+.priority-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 2px;
+  color: #fff;
+}
+.priority-badge.low { background: #15803d; }
+.priority-badge.medium { background: #2563eb; }
+.priority-badge.high { background: #b91c1c; }
+
+/* Erledigt Fade-out Animation */
+@keyframes fadeOutCompleted {
+  from { opacity: 1; }
+  to { opacity: 0.5; }
+}
+tr.completed {
+  animation: fadeOutCompleted 0.8s ease-in;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+/* Hovereffekt */
+tbody tr:hover {
+  background: #e0e7ef !important;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+  z-index: 2;
+}
+button:hover, .btn:hover {
+  filter: brightness(1.08) drop-shadow(0 2px 8px #2563eb22);
+}
+
+/* Mobil */
+@media (max-width: 720px) {
+  .table-wrap {
+    border: none;
+    box-shadow: none;
+    background: none;
+  }
+  table, tbody, tr, td {
+    display: block;
+    width: 100%;
+  }
+  tbody tr {
+    background: #fff;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(2,6,23,0.08);
+    border: 1px solid #e2e8f0;
+    padding: 10px 0;
+  }
+  tbody td {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border: none;
+    font-size: 15px;
+  }
+  tbody td::before {
+    min-width: 90px;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+tr.completed .heute-letzter-tag {
+  color: #aaa !important;
+  text-decoration: line-through !important;
+  animation: none !important;
+}
+/* Completed + Frist abgelaufen: */
+tr.completed .frist-abgelaufen {
+  color: #aaa !important;
+  text-decoration: line-through !important;
+  animation: none !important;
+}
+
+
+:root {
+  --brand: #1d4ed8;
+  --brand-600: #1e40af;
+  --brand-700: #1e3a8a;
+  --accent: #0ea5e9;
+  --bg: #f1f5f9; 
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --success: #15803d;
+  --warning: #2563eb;
+  --danger: #b91c1c;
+  --radius: 12px;
+  --shadow: 0 4px 14px rgba(2, 6, 23, 0.08);
+  --done: #9ca3af;
+}
+
+
+/*  Global Reset/Typo  */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(24px, 2.2vw + 14px, 36px);
+  letter-spacing: -0.02em;
+}
+
+p { color: var(--muted); }
+
+/*  Layout  */
+.logo-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.logo-header img {
+  max-height: 200px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/*  Buttons  */
+button, .btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: var(--brand);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform .08s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+}
+button:hover, .btn:hover { background: var(--brand-600); }
+button:active, .btn:active { transform: translateY(1px); }
+button:focus-visible, .btn:focus-visible {
+  outline: 3px solid rgba(14,165,233,.5);
+  outline-offset: 2px;
+}
+
+.addButton { background: linear-gradient(180deg, var(--brand), var(--brand-700)); }
+.updateButton { background: var(--accent); }
+.deleteButton { background: var(--danger); }
+.deleteButton:hover { filter: brightness(0.92); }
+
+/*  Forms  */
+form#taskForm {
+  margin-top: 20px;
+  padding: 20px;
+  gap: 14px;
+}
+
+label { font-weight: 600; font-size: 14px; }
+
+input[type="text"], input[type="date"], select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border .2s ease, box-shadow .2s ease;
+}
+
+input[type="text"]:focus, input[type="date"]:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(14,165,233,0.2);
+}
+
+/*  Table  */
+.table-wrap {
+  overflow: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(0deg, rgba(2,6,23,0.02), transparent), var(--surface);
+  color: var(--muted);
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 14px;
+}
+
+tbody td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:hover { background: rgba(2, 132, 199, 0.06); }
+
+tbody tr:last-child td { border-bottom: none; }
+
+td:nth-child(1) { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Status Checkbox */
+.completedCheckbox { width: 18px; height: 18px; accent-color: var(--success); }
+
+/* Priority Badges */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.badge.low { background: rgba(21,128,61,0.12); color: var(--success); }
+.badge.medium { background: rgba(37,99,235,0.12); color: var(--warning); }
+.badge.high { background: rgba(185,28,28,0.12); color: var(--danger); }
+
+td:nth-child(6) { font-weight: 600; }
+
+/*  Custom: erledigt - deadlines  */
+tr.erledigt td { color: var(--done); }
+
+.deadline-expired {
+  text-decoration: underline red 2px;
+  text-underline-offset: 2px;
+}
+
+/*  Utilities  */
+.hidden { display: none !important; }
+.center { display: grid; place-items: center; }
+.mt-2 { margin-top: 8px; }
+.mt-4 { margin-top: 16px; }
+
+/*  Page Specific  */
+#form { margin-top: 20px; }
+
+h1 {
+  background: linear-gradient(90deg, var(--brand), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+section { margin-top: 16px; }
+
+/* Responsive */
+@media (max-width: 720px) {
+  thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody td { display: grid; grid-template-columns: 120px 1fr; gap: 8px; }
+  tbody td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* Priorität - Erledigt Status */
+/* 1. Erledigt sönük */
+tr.completed td {
+    color: #aaa !important;
+    font-style: italic;
+}
+
+/* 2. nicht Erledigt   */
+tr.low td { color: #006400; }    
+tr.medium td { color: #003399; }   
+tr.high td { color: #b71c1c; }  
+
+/* 3. Frist abgelaufen   */
+.frist-abgelaufen {
+    color: #5f024e;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+/* 4. Heute letzter Tag */
+.heute-letzter-tag {
+    color: #7e267e;
+    font-weight: bold;
+    text-decoration: underline;
+    animation: blink-heute 1s steps(5, start) infinite;
+}
+@keyframes blink-heute {
+  25%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* 
+.low { background-color: #01561b; } 
+.medium { background-color: #181e7a; }  
+.high { background-color: #982b2b; } 
+.completed { color: #888; background-color: #f0f0f0; } */

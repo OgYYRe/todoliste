@@ -31,6 +31,7 @@ function getPriorityLabel(priority) {
 let editTaskId = null; // Variable zum Speichern der ID der zu bearbeitenden Aufgabe
 let addButton = document.querySelector(".addButton");
 let taskForm = document.getElementById("taskForm"); // Formular Anzeige
+let editTaskCompleted = false; 
 
 
 //----Formular Inputs
@@ -97,6 +98,43 @@ createButton.addEventListener("click", (e) => {
 
 });//-------------------------API POST endpoint---------------------------------
 
+    // Task aktualisieren (button)
+updateButton.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    if (!editTaskId) return;
+
+    const updatedTask = {
+        title: titleInput.value,
+        description: descriptionInput.value ?? "",
+        due_date: due_dateInput.value ?? "",
+        priority: priorityInput.value ?? "Low",
+        completed: editTaskCompleted  
+    };
+
+    (async () => {
+        try {
+            const response = await fetch(API.updateTask(editTaskId), {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: jsonMaker(updatedTask)
+            });
+            if (!response.ok) throw new Error("Fehler beim Aktualisieren der Aufgabe!");
+            alert("Task erfolgreich aktualisiert!");
+            taskForm.reset();
+            taskForm.style.display = "none";
+            createButton.style.display = "block";
+            updateButton.style.display = "none";
+            editTaskId = null;
+            renderTasks();
+        } catch (error) {
+            alert(error.message || "Fehler beim Aktualisieren der Aufgabe. Bitte versuchen Sie es erneut.");
+        }
+    })();
+});
+
 // Formular abbrechen (button) 
 cancelButton.addEventListener("click", (e) => {
     e.preventDefault();  // Warten auf Klick
@@ -105,8 +143,16 @@ cancelButton.addEventListener("click", (e) => {
 });
 //--------------------------Hinzufügen--------------------------------------
 
-
-
+// Datum formatieren für Anzeige
+function formatDateForDisplay(dateString) {
+    if (!dateString) return "Kein Fälligkeitsdatum";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Ungültiges Datum";
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+}
 
 // Datum Berechnung
 function calculateRemainingDays(due_dateInput) {
@@ -116,7 +162,9 @@ function calculateRemainingDays(due_dateInput) {
     if (isNaN(due.getTime())) return ""; //hier leer wenn ungueltig
     const timeDiff = due - today;
     const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-     return daysDiff > 0 ? `${daysDiff} Tage` : "Frist abgelaufen";
+    if (daysDiff > 0) return { text: `${daysDiff} Tage`, class: "" };
+    if (daysDiff === 0) return { text: "Heute letzter Tag", class: "heute-letzter-tag" };
+    return { text: "Frist abgelaufen", class: "frist-abgelaufen" };
 }
 
 // render funktion für Anzeige der Tabelle von DB
@@ -131,17 +179,27 @@ async function renderTasks() {
         console.log("Geladene Aufgaben:", tasks); // Debugging: Überprüfen der geladenen Aufgaben
 
         taskTableBody.innerHTML = ""; // Tabelle leeren
+        tasks.sort((a, b) => a.id - b.id); // Sortieren nach ID aufsteigend
+
 
     // Tabelle füllen
     tasks.forEach((task, index) => {
         let row = document.createElement("tr");
+        let priorityClass = (task.completed ? "" : (task.priority ?? "low").toLowerCase());
+        let completedClass = task.completed ? "completed" : "";
+        row.className = `${priorityClass} ${completedClass}`.trim();
+        const { text: daysText, class: daysClass } = calculateRemainingDays(task.due_date);
         row.innerHTML = `
             <td>${index + 1}</td>
             <td>${task.title ?? "Kein Titel"}</td>
             <td>${task.description ?? "Keine Beschreibung"}</td>
-            <td>${task.due_date ?? "Kein Fälligkeitsdatum"}</td>
-            <td>${calculateRemainingDays(task.due_date)}</td>
-            <td>${getPriorityLabel(task.priority) ?? "Keine Priorität"}</td>
+            <td>${formatDateForDisplay(task.due_date)}</td>
+            <td><span class="${daysClass}">${daysText}</span></td>
+            
+            <td>
+            <span class="priority-badge ${(task.priority ?? "low").toLowerCase()}">${getPriorityLabel(task.priority)}</span>
+            </td>
+            
             <td>
             <input type="checkbox" class="completedCheckbox" ${task.completed ? "checked" : ""}>
             </td>
@@ -150,6 +208,7 @@ async function renderTasks() {
             <button type="button" class="updateButton" data-id="${task.id}">Bearbeiten</button>
             </td>
         `;
+
         taskTableBody.appendChild(row);
     });
 
@@ -190,6 +249,7 @@ async function renderTasks() {
             titleInput.value = task.title ?? "";
             descriptionInput.value = task.description ?? "";
             due_dateInput.value = (task.due_date ?? "").slice(0, 10); // Formatieren für input type date
+            editTaskCompleted = task.completed; // Setzen completed-Status
             priorityInput.value = task.priority ?? "Low";
             taskForm.style.display = "block"; // Formular anzeigen
             createButton.style.display = "none"; // Hinzufügen-Button ausblenden
@@ -203,17 +263,22 @@ async function renderTasks() {
             const id = this.closest("tr").querySelector(".updateButton").getAttribute("data-id");
             const completed = this.checked;
             try {
-                const response = await fetch(API.updateTask(id), {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ completed })
-                }); // wichtig: Body mitsenden
+                const response = await fetch(API.getTaskById(id));
                 if (!response.ok) throw new Error("Fehler beim Aktualisieren der Aufgabe!");
+                const task = await response.json();
+                task.completed = completed; // Aktualisieren des completed-Status
+
+                const updateResponse = await fetch(API.updateTask(id), {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: jsonMaker(task)
+                });
+                if (!updateResponse.ok) throw new Error("Fehler beim Aktualisieren der Aufgabe!");
                 renderTasks(); // Tabelle aktualisieren nach dem Ändern des Status
             } catch (error) {
-                alert("Fehler beim Aktualisieren der Aufgabe. Bitte versuchen Sie es erneut.");
+                alert(error.message || "Fehler beim Aktualisieren der Aufgabe. Bitte versuchen Sie es erneut.");
                 console.error("Fehler beim Aktualisieren der Aufgabe:", error);
             }
         });
