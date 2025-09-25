@@ -63,6 +63,13 @@ addButton.addEventListener("click", () => {
 createButton.addEventListener("click", (e) => {
     e.preventDefault(); // Verhindert das automatische Neuladen der Seite
 
+    // Titel erfolgreich validieren
+    if (!titleInput.value.trim()) {
+        alert("Titel ist erforderlich!");
+        titleInput.focus();
+        return;
+    }
+
     // Formular absenden und neues Task erstellen
     const newTask = {
         //! ID muss von der Backend-API generiert werden
@@ -103,11 +110,16 @@ updateButton.addEventListener("click", (e) => {
     e.preventDefault();
 
     if (!editTaskId) return;
+    if (!titleInput.value.trim()) {
+        alert("Titel ist erforderlich!");
+        titleInput.focus();
+        return;
+    }
 
     const updatedTask = {
         title: titleInput.value,
         description: descriptionInput.value ?? "",
-        due_date: due_dateInput.value ?? "",
+        due_date: due_dateInput.value === "" ? null : due_dateInput.value,
         priority: priorityInput.value ?? "Low",
         completed: editTaskCompleted  
     };
@@ -156,10 +168,10 @@ function formatDateForDisplay(dateString) {
 
 // Datum Berechnung
 function calculateRemainingDays(due_dateInput) {
-    if (!due_dateInput) return ""; //hier leer wenn kein datum
+    if (!due_dateInput) return { text: "Kein Fälligkeitsdatum", class: "" }; //hier anzeige wenn kein datum
     const today = new Date();
     const due = new Date(due_dateInput);
-    if (isNaN(due.getTime())) return ""; //hier leer wenn ungueltig
+    if (isNaN(due.getTime())) return { text: "Ungültiges Datum", class: "" }; //hier anzeige wenn ungültig
     const timeDiff = due - today;
     const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
     if (daysDiff > 0) return { text: `${daysDiff} Tage`, class: "" };
@@ -181,6 +193,20 @@ async function renderTasks() {
         taskTableBody.innerHTML = ""; // Tabelle leeren
         tasks.sort((a, b) => a.id - b.id); // Sortieren nach ID aufsteigend
 
+        // Wenn keine Aufgaben vorhanden sind, zeige eine freundliche Nachricht
+        if (tasks.length === 0) {
+            taskTableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px; font-size: 18px; color: #64748b;">
+                        🎉 <strong>Juhu!</strong> Keine Aufgaben zu erledigen.<br>
+                        <span style="font-size: 16px; margin-top: 10px; display: block;">
+                            Jetzt kann gefaulenzt werden! 😎
+                        </span>
+                    </td>
+                </tr>
+            `;
+            return; 
+        }
 
     // Tabelle füllen
     tasks.forEach((task, index) => {
